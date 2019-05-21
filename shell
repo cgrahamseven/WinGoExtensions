@@ -1,0 +1,144 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Text.RegularExpressions;
+
+namespace WinGo
+{
+    public static class Shell
+    {
+        private static string cwd = Environment.CurrentDirectory;
+
+        public static string Dir( string path )
+        {
+            string results = "";
+            string directoryPath = cwd;
+            try
+            {
+                Regex absRe = new Regex( @"^[a-z]:\\", RegexOptions.IgnoreCase );
+                Regex envRe = new Regex( @"^%(.+?)%$" );
+
+                if ( path != null && path.StartsWith( "." ) )
+                    directoryPath = Path.GetFullPath( cwd + "\\" + path );
+                else if ( path != null && absRe.IsMatch( path ) )
+                    directoryPath = Path.GetFullPath( path );
+                else if ( path != null && Directory.Exists( cwd + "\\" + path ) )
+                    directoryPath = Path.GetFullPath( cwd + "\\" + path );
+                else if ( path != null && envRe.IsMatch( path ) )
+                    directoryPath = Path.GetFullPath( Environment.GetEnvironmentVariable( envRe.Match( path ).Groups[ 1 ].Value ) );
+
+                DirectoryInfo dirs = new DirectoryInfo( directoryPath );
+                foreach ( DirectoryInfo dir in dirs.EnumerateDirectories() )
+                {
+                    results += string.Format( 
+                        "{0,-10:d}  {1,-10:t}\t{2,-10}\t{3,-10}", 
+                        dir.CreationTime, 
+                        dir.CreationTime,
+                        "<DIR>", 
+                        dir.Name 
+                    ) + Environment.NewLine;
+                }
+                foreach ( FileInfo file in dirs.EnumerateFiles() )
+                {
+                    results += string.Format( 
+                        "{0,-10:d}  {1,-10:t}\t{2,-10}\t{3,-10}", 
+                        file.CreationTime,
+                        file.CreationTime, 
+                        string.Format( "{0,-10:0,0}", file.Length ), 
+                        file.Name 
+                    ) + Environment.NewLine;
+                }
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+
+            return results;
+        }
+        public static string Cd( string path )
+        {
+            string currentDir = cwd;
+            try
+            {
+                Regex re = new Regex( @"^[a-z]:\\", RegexOptions.IgnoreCase );
+                Regex envRe = new Regex( @"^%(.+?)%$" );
+
+                if ( path != null && path.StartsWith( "." ) )
+                    currentDir = Path.GetFullPath( cwd + "\\" + path );
+                else if ( path != null && re.IsMatch( path ) )
+                    currentDir = Path.GetFullPath( path );
+                else if ( path != null && Directory.Exists( cwd + "\\" + path ) )
+                    currentDir = Path.GetFullPath( cwd + "\\" + path );
+                else if ( path != null && envRe.IsMatch( path ) )
+                    currentDir = Path.GetFullPath( Environment.GetEnvironmentVariable( envRe.Match( path ).Groups[ 1 ].Value ) );
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+            cwd = currentDir;
+            return cwd;
+        }
+        public static string Env()
+        {
+            string results = "";
+            try
+            {
+                foreach ( DictionaryEntry entry in Environment.GetEnvironmentVariables() )
+                    results += entry.Key.ToString() + "=" + entry.Value.ToString() + Environment.NewLine;
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+
+            return results;
+        }
+        public static string Del( string path )
+        {
+            Regex re = new Regex( @"^[a-z]:\\", RegexOptions.IgnoreCase );
+            string fullPath = path;
+
+            try
+            {
+                if ( !re.IsMatch( fullPath ) )
+                    fullPath = Path.GetFullPath( cwd + "\\" + path );
+                if ( !File.Exists( fullPath ) )
+                    throw new FileNotFoundException();
+                File.Delete( fullPath );
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+
+            return "[+] Success";
+        }
+        public static string Copy( string path, string newPath )
+        {
+            Regex re = new Regex( @"^[a-z]:\\", RegexOptions.IgnoreCase );
+            string fullSrcPath = path;
+            string fullDstPath = newPath;
+
+            try
+            {
+                if ( !re.IsMatch( path ) )
+                    fullSrcPath = Path.GetFullPath( cwd + "\\" + path );
+                if ( !re.IsMatch( newPath ) )
+                    fullDstPath = Path.GetFullPath( cwd + "\\" + newPath );
+                File.Copy( fullSrcPath, fullDstPath );
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+
+            return "[+] Success";
+        }
+        public static void Main()
+        {
+
+        }
+    }
+}

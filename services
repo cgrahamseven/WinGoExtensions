@@ -1,0 +1,127 @@
+using System;
+using System.ServiceProcess;
+using System.Collections.Generic;
+
+namespace WinGo
+{
+    public static class Services
+    {
+        private static Dictionary<ServiceControllerStatus, string> svcStates = new Dictionary<ServiceControllerStatus, string>()
+        {
+            { ServiceControllerStatus.Stopped, "STOPPED" },
+            { ServiceControllerStatus.StartPending, "START_PENDING" },
+            { ServiceControllerStatus.StopPending, "STOP_PENDING" },
+            { ServiceControllerStatus.Running, "RUNNING" },
+            { ServiceControllerStatus.ContinuePending, "CONTINUE_PENDING" },
+            { ServiceControllerStatus.PausePending, "PAUSE_PENDING" },
+            { ServiceControllerStatus.Paused, "PAUSED" }
+        };
+        private static Dictionary<ServiceType, string> svcTypes = new Dictionary<ServiceType, string>()
+        {
+            { ServiceType.Adapter, "ADAPTER" },
+            { ServiceType.FileSystemDriver, "FILE_SYSTEM_DRIVER" },
+            { ServiceType.InteractiveProcess, "INTERACTIVE_PROCESS" },
+            { ServiceType.KernelDriver, "WIN_KERNEL_DRIVER" },
+            { ServiceType.RecognizerDriver, "RECOGNIZER_DRIVER" },
+            { ServiceType.Win32OwnProcess, "WIN32_OWN_PROCESS" },
+            { ServiceType.Win32ShareProcess, "WIN32_SHARE_PROCESS" }
+        };
+        public static string ServicesList()
+        {
+            string results = string.Format( "{0,-10}  {1,-10}\t\t\t{2,-10}\t{3,-10}\n\n", "State", "Type", "Name", "Display Name" );
+            ServiceController[] services = ServiceController.GetServices();
+            ServiceController[] devices = ServiceController.GetDevices();
+
+            foreach ( ServiceController service in services )
+            {
+                try
+                {
+                    results += string.Format(
+                        "{0,-10}  {1,-10}\t\t{2,-10}\t{3,-10}",
+                        svcStates[ service.Status ],
+                        svcTypes[ service.ServiceType ],
+                        service.ServiceName,
+                        service.DisplayName
+                    ) + Environment.NewLine;
+                }
+                catch ( Exception )
+                {
+                    // There may be services we don't have permission to access
+                }
+            }
+            foreach ( ServiceController device in devices )
+            {
+                try
+                {
+                    results += string.Format(
+                        "{0,-10}  {1,-10}\t\t{2,-10}\t{3,-10}",
+                        svcStates[ device.Status ],
+                        svcTypes[ device.ServiceType ],
+                        device.ServiceName,
+                        device.DisplayName
+                    ) + Environment.NewLine;
+                }
+                catch ( Exception )
+                {
+                    // There may be devices we don't have permission to access
+                }
+            }
+
+            return results;
+        }
+        public static string ServiceStart( string serviceName )
+        {
+            try
+            {
+                using ( ServiceController service = new ServiceController( serviceName ) )
+                {
+                    service.Start();
+                }
+                return "[+] Success";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string ServiceStop( string serviceName )
+        {
+            try
+            {
+                using ( ServiceController service = new ServiceController( serviceName ) )
+                {
+                    service.Stop();
+                }
+                return "[+] Success";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string ServiceQuery( string serviceName )
+        {
+            try
+            {
+                using ( ServiceController service = new ServiceController( serviceName ) )
+                {
+                    return string.Format(
+                        "{0,-10}  {1,-10}\t\t{2,-10}\t{3,-10}",
+                        svcStates[ service.Status ],
+                        svcTypes[ service.ServiceType ],
+                        service.ServiceName,
+                        service.DisplayName
+                    );
+                }
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static void Main()
+        {
+
+        }
+    }
+}
