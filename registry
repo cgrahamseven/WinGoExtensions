@@ -1,0 +1,540 @@
+using System;
+using System.Linq;
+using System.Text;
+using Microsoft.Win32;
+
+namespace WinGo
+{
+    public static class Reg
+    {
+        public static string Enumerate( string key, string subKey )
+        {
+            bool enumKeyOnly = subKey == "" ? true : false;
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.LocalMachine )
+                                return string.Join( "\r\n", regKey.GetSubKeyNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetSubKeyNames() );
+                        }
+                    case "HKCU":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.CurrentUser )
+                                return string.Join( "\r\n", regKey.GetSubKeyNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetSubKeyNames() );
+                        }
+                    case "HKUSERS":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.Users )
+                                return string.Join( "\r\n", regKey.GetSubKeyNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.Users )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetSubKeyNames() );
+                        }
+                    case "HKCR":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.ClassesRoot )
+                                return string.Join( "\r\n", regKey.GetSubKeyNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetSubKeyNames() );
+                        }
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string EnumerateValues( string key, string subKey )
+        {
+            bool enumKeyOnly = subKey == "" ? true : false;
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.LocalMachine )
+                                return string.Join( "\r\n", regKey.GetValueNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetValueNames() );
+                        }
+                    case "HKCU":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.CurrentUser )
+                                return string.Join( "\r\n", regKey.GetValueNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetValueNames() );
+                        }
+                    case "HKUSERS":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.Users )
+                                return string.Join( "\r\n", regKey.GetValueNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.Users )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetValueNames() );
+                        }
+                    case "HKCR":
+                        if ( enumKeyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.ClassesRoot )
+                                return string.Join( "\r\n", regKey.GetValueNames() );
+                        }
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return string.Join( "\r\n", regSubKey.GetValueNames() );
+                        }
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string GetKeyValue( string key, string subKey, string valueName )
+        {
+            bool keyOnly = subKey == "" ? true : false;
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.LocalMachine )
+                                return RetrieveKeyValue( regKey, valueName );
+                        }
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return RetrieveKeyValue( regSubKey, valueName );
+                        }
+                    case "HKCU":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.CurrentUser )
+                                return RetrieveKeyValue( regKey, valueName );
+                        }
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return RetrieveKeyValue( regSubKey, valueName );
+                        }
+                    case "HKUSERS":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.Users )
+                                return RetrieveKeyValue( regKey, valueName );
+                        }
+                        using ( RegistryKey regKey = Registry.Users )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return RetrieveKeyValue( regSubKey, valueName );
+                        }
+                    case "HKCR":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.ClassesRoot )
+                                return RetrieveKeyValue( regKey, valueName );
+                        }
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return RetrieveKeyValue( regSubKey, valueName );
+                        }
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        private static string RetrieveKeyValue( RegistryKey regKey, string valueName )
+        {
+            switch ( regKey.GetValueKind( valueName ) )
+            {
+                case RegistryValueKind.DWord:
+                    return ( ( Int32 ) regKey.GetValue( valueName ) ).ToString();
+                case RegistryValueKind.QWord:
+                    return ( ( Int64 ) regKey.GetValue( valueName ) ).ToString();
+                case RegistryValueKind.ExpandString:
+                case RegistryValueKind.MultiString:
+                case RegistryValueKind.String:
+                    return ( string ) regKey.GetValue( valueName );
+                case RegistryValueKind.Binary:
+                    return HexDump( ( byte[] ) regKey.GetValue( valueName ) );
+                case RegistryValueKind.Unknown:
+                    return "[-] Unsupported";
+                case RegistryValueKind.None:
+                    return "[-] No data";
+                default:
+                    return "[-] Unable to determine data type";
+            }
+        }
+        public static string SetKeyValue( string key, string subKey, string valueName, string value, string valueType )
+        {
+            bool keyOnly = subKey == "" ? true : false;
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.LocalMachine )
+                                return PutKeyValue( regKey, valueName, value, valueType );
+                        }
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey, true ) )
+                                return PutKeyValue( regSubKey, valueName, value, valueType );
+                        }
+                    case "HKCU":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.CurrentUser )
+                                return PutKeyValue( regKey, valueName, value, valueType );
+                        }
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey, true ) )
+                                return PutKeyValue( regSubKey, valueName, value, valueType );
+                        }
+                    case "HKUSERS":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.Users )
+                                return PutKeyValue( regKey, valueName, value, valueType );
+                        }
+                        using ( RegistryKey regKey = Registry.Users )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey, true ) )
+                                return PutKeyValue( regSubKey, valueName, value, valueType );
+                        }
+                    case "HKCR":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.ClassesRoot )
+                                return PutKeyValue( regKey, valueName, value, valueType );
+                        }
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey, true ) )
+                                return PutKeyValue( regSubKey, valueName, value, valueType );
+                        }
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string CreateKey( string key, string subKey )
+        {
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                            regKey.CreateSubKey( subKey );
+                        return "[+] Success";
+                    case "HKCU":
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                            regKey.CreateSubKey( subKey );
+                        return "[+] Success";
+                    case "HKUSERS":
+                        using ( RegistryKey regKey = Registry.Users )
+                            regKey.CreateSubKey( subKey );
+                        return "[+] Success";
+                    case "HKCR":
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                            regKey.CreateSubKey( subKey );
+                        return "[+] Success";
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string DeleteKey( string key, string subKey )
+        {
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                            regKey.DeleteSubKey( subKey, true );
+                        return "[+] Success";
+                    case "HKCU":
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                            regKey.DeleteSubKey( subKey, true );
+                        return "[+] Success";
+                    case "HKUSERS":
+                        using ( RegistryKey regKey = Registry.Users )
+                            regKey.DeleteSubKey( subKey, true );
+                        return "[+] Success";
+                    case "HKCR":
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                            regKey.DeleteSubKey( subKey, true );
+                        return "[+] Success";
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string DeleteKeyAndChildren( string key, string subKey )
+        {
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                            regKey.DeleteSubKeyTree( subKey, true );
+                        return "[+] Success";
+                    case "HKCU":
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                            regKey.DeleteSubKeyTree( subKey, true );
+                        return "[+] Success";
+                    case "HKUSERS":
+                        using ( RegistryKey regKey = Registry.Users )
+                            regKey.DeleteSubKeyTree( subKey, true );
+                        return "[+] Success";
+                    case "HKCR":
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                            regKey.DeleteSubKeyTree( subKey, true );
+                        return "[+] Success";
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        public static string DisplayEnumeratedValues( string key, string subKey )
+        {
+            bool keyOnly = subKey == "" ? true : false;
+            try
+            {
+                switch ( key )
+                {
+                    case "HKLM":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.LocalMachine )
+                                return GetKeyValues( regKey );
+                        }
+                        using ( RegistryKey regKey = Registry.LocalMachine )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return GetKeyValues( regSubKey );
+                        }
+                    case "HKCU":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.CurrentUser )
+                                return GetKeyValues( regKey );
+                        }
+                        using ( RegistryKey regKey = Registry.CurrentUser )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return GetKeyValues( regSubKey );
+                        }
+                    case "HKUSERS":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.Users )
+                                return GetKeyValues( regKey );
+                        }
+                        using ( RegistryKey regKey = Registry.Users )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return GetKeyValues( regSubKey );
+                        }
+                    case "HKCR":
+                        if ( keyOnly )
+                        {
+                            using ( RegistryKey regKey = Registry.ClassesRoot )
+                                return GetKeyValues( regKey );
+                        }
+                        using ( RegistryKey regKey = Registry.ClassesRoot )
+                        {
+                            using ( RegistryKey regSubKey = regKey.OpenSubKey( subKey ) )
+                                return GetKeyValues( regSubKey );
+                        }
+                    default:
+                        break;
+                }
+                return "[-] Invalid registry key specified";
+            }
+            catch ( Exception ex )
+            {
+                return ex.ToString();
+            }
+        }
+        private static string GetKeyValues( RegistryKey regKey )
+        {
+            string values = string.Format( "{0,-20}\t\t{1,-20}\n\n", "Name", "Value" );
+            foreach ( string valueName in regKey.GetValueNames() )
+            {
+                switch ( regKey.GetValueKind( valueName ) )
+                {
+                    case RegistryValueKind.DWord:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, Convert.ToInt32( regKey.GetValue( valueName ) ) ) + Environment.NewLine;
+                        break;
+                    case RegistryValueKind.QWord:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, Convert.ToInt64( regKey.GetValue( valueName ) ) ) + Environment.NewLine;
+                        break;
+                    case RegistryValueKind.ExpandString:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, ( string ) regKey.GetValue( valueName ) ) + Environment.NewLine;
+                        break;
+                    case RegistryValueKind.MultiString:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, HexDump( ( byte[] ) regKey.GetValue( valueName ) ) ) + Environment.NewLine;
+                        break;
+                    case RegistryValueKind.String:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, ( string ) regKey.GetValue( valueName ) ) + Environment.NewLine;
+                        break;
+                    case RegistryValueKind.Binary:
+                        values += string.Format( "{0,-20}\t\t{1,-20}", valueName, HexDump( ( byte[] ) regKey.GetValue( valueName ) ) ) + Environment.NewLine;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return values;
+        }
+        private static string PutKeyValue( RegistryKey regKey, string valueName, string value, string valueType )
+        {
+            if ( valueType == "" )
+            {
+                switch ( regKey.GetValueKind( valueName ) )
+                {
+                    case RegistryValueKind.DWord:
+                        regKey.SetValue( valueName, Convert.ToInt32( value ), RegistryValueKind.DWord );
+                        return "[+] Success";
+                    case RegistryValueKind.QWord:
+                        regKey.SetValue( valueName, Convert.ToInt64( value ), RegistryValueKind.QWord );
+                        return "[+] Success";
+                    case RegistryValueKind.ExpandString:
+                        regKey.SetValue( valueName, value, RegistryValueKind.ExpandString );
+                        return "[+] Success";
+                    case RegistryValueKind.MultiString:
+                        regKey.SetValue( valueName, value, RegistryValueKind.MultiString );
+                        return "[+] Success";
+                    case RegistryValueKind.String:
+                        regKey.SetValue( valueName, value, RegistryValueKind.String );
+                        return "[+] Success";
+                    case RegistryValueKind.Binary:
+                        regKey.SetValue( valueName, Convert.FromBase64String( value ), RegistryValueKind.Binary );
+                        return "[+] Success";
+                    case RegistryValueKind.Unknown:
+                    case RegistryValueKind.None:
+                        return "[-] Registry value has unknown data type or no data type. Cannot set value.";
+                    default:
+                        return "[-] Unable to determine data type for value conversion";
+                }
+            }
+            switch ( valueType )
+            {
+                case "dword":
+                    regKey.SetValue( valueName, Convert.ToInt32( value ), RegistryValueKind.DWord );
+                    return "[+] Success";
+                case "qword":
+                    regKey.SetValue( valueName, Convert.ToInt64( value ), RegistryValueKind.QWord );
+                    return "[+] Success";
+                case "estring":
+                    regKey.SetValue( valueName, value, RegistryValueKind.ExpandString );
+                    return "[+] Success";
+                case "mstring":
+                    regKey.SetValue( valueName, value, RegistryValueKind.MultiString );
+                    return "[+] Success";
+                case "string":
+                    regKey.SetValue( valueName, value, RegistryValueKind.String );
+                    return "[+] Success";
+                case "binary":
+                    regKey.SetValue( valueName, Convert.FromBase64String( value ), RegistryValueKind.Binary );
+                    return "[+] Success";
+                default:
+                    return "[-] Invalid data type given for requested value";
+            }
+        }
+        private static string HexDump( byte[] bytes, int bytesPerLine = 16 )
+        {
+            StringBuilder sb = new StringBuilder();
+            for ( int line = 0; line < bytes.Length; line += bytesPerLine )
+            {
+                byte[] lineBytes = bytes.Skip( line ).Take( bytesPerLine ).ToArray();
+                sb.AppendFormat( "{0:x8} ", line );
+                sb.Append( string.Join( " ", lineBytes.Select( b => b.ToString( "x2" ) )
+                       .ToArray() ).PadRight( bytesPerLine * 3 ) );
+                sb.Append( " " );
+                sb.Append( new string( lineBytes.Select( b => b < 32 ? '.' : ( char ) b )
+                       .ToArray() ) );
+                sb.Append( "\r\n" );
+            }
+            return sb.ToString();
+        }
+        public static void Main()
+        {
+
+        }
+    }
+}
